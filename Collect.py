@@ -35,7 +35,7 @@ while True:
 print("Exited Loop")
 
 # looping through data vector and removing bad data
-# then, create vectors for time, red, and IR variables
+# then, create vectors for time (Necessary), red, and IR variables (Unnecessary given data analysis in second file)
 t_vec,ir_vec,red_vec = [],[],[]
 ir_prev,red_prev = 0.0,0.0
 for ii in range(3,len(all_data)):
