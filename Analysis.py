@@ -8,7 +8,7 @@ from scipy.signal import argrelextrema
 plt.style.use('ggplot')
 
 
-## reading data saved in .csv file
+# reading data saved in .csv file
 t_vec,ir_vec,red_vec = [],[],[]
 with open('test_data.csv',newline='') as csvfile:
     csvreader = csv.reader(csvfile,delimiter=',')
@@ -21,7 +21,7 @@ with open('test_data.csv',newline='') as csvfile:
 
 s1 = 0 # change this for different range of data
 s2 = len(t_vec) # change this for ending range of data
-t_vec = np.array(t_vec[s1:s2])
+t_vec = np.array(t_vec[s1:s2]) 
 ir_vec = ir_vec[s1:s2]
 red_vec = red_vec[s1:s2]
 
@@ -55,7 +55,7 @@ plt.xlim([t_vec[0],t_vec[-1]])
 plt.tight_layout(pad=1.2)
 #plt.savefig('max30102_python_example.png',dpi=300,facecolor=[252/255,252/255,252/255])
 #plt.show()
-print("Working")
+#print("Working")
 
 ## FFT and plotting frequency spectrum of data
 f_vec = np.arange(0,int(len(t_vec)/2))*(samp_rate/(len(t_vec)))
@@ -103,8 +103,8 @@ ax3.set_ylabel('Amplitude',fontsize=16)
 ax3.legend(fontsize=16)
 ax3.tick_params(axis='both',which='major',labelsize=16)
 #plt.show()
-# calculating heart rate
 #t1 = time.time()
+# calculating heart rate red light
 y_vals = red_vec
 samp_rate = 1/np.mean(np.diff(t_vec)) # average sample rate for determining peaks
 min_time_bw_samps = (60.0/heart_rate_span[1])
@@ -171,8 +171,8 @@ ax4.set_ylabel('Amplitude',fontsize=16)
 ax4.legend(fontsize=16)
 ax4.tick_params(axis='both',which='major',labelsize=16)
 #plt.show()
-# calculating heart rate
 #t1 = time.time()
+# calculating heart rate IR light
 y_vals1 = ir_vec
 #samp_rate1 = 1/np.mean(np.diff(t_vec)) # average sample rate for determining peaks
 #min_time_bw_samps1 = (60.0/heart_rate_span[1])
@@ -231,6 +231,7 @@ for rr in true_peak_locs1:
    
 line4.set_data(scatter_x1,scatter_y1)
 
+# caculations for Spo2 setup
 #max_r = np.argmax(red_vec)
 #min_r = np.argmin(red_vec)
 a = y_vals1
@@ -256,6 +257,7 @@ check_length = np.array([len(rmax), len(rmin), len(irmax), len(irmin)])
 #spo2 = np.append(spo2, 2)
 #print(spo2)
 #print(check_length)
+## variables to calculate Spo2
 ac_ir = np.array([irmax[0]-irmin[0]])
 dc_ir = np.array([(irmax[0] - ac_ir[0])/2])
 ac_r = np.array([rmax[0]-rmin[0]])
@@ -276,9 +278,11 @@ c1 = 100.0
 spo2 = np.array([a1*(big_R[0]*big_R[0]) + b1*(big_R[0]) + c1])
 for df in range(1,check_length.min()):
     spo2 = np.append(spo2, a1*(big_R[df]*big_R[df]) + b1*(big_R[df]) + c1)
-
+# SPO2 = aR^2 + bR + c
+# filter check initialize first point
 spo2clone = np.array([100.0])
 anomaly = np.array([1])
+# find anomalies range can be changed. Improved by a calculation instead of set range.
 for rc in range(0,len(spo2)):
     if spo2[rc] <= 115 and spo2[rc] >= 70:
         spo2clone = np.append(spo2clone, spo2[rc])
@@ -289,6 +293,7 @@ e = spo2clone
 min_spo2 = argrelextrema(spo2clone, np.less)
 minsforspo2 = e[min_spo2]
 
+# detect peaks keep them relative to time
 time = np.array([0])
 peak_detector = np.array([0])
 for ty in range(1,len(spo2clone)):
@@ -312,7 +317,7 @@ for tu in range(1,len(spo2clone)):
        
 #    else
        
-       
+# results displayed to user      
 print('Anomalies in Spo2')            
 print(anomaly)
 print('Number of Anomalies in Spo2')
@@ -327,13 +332,13 @@ ax5.set_xlabel('Time [s]',fontsize=24)
 ax5.set_ylabel('Spo2',fontsize=24,color='#CE445D',labelpad=10)
 plt5 = ax5.plot(time, spo2clone,label='Spo2',color='#CE445D',linewidth=4)
 
-
+# plot peaks on spo2 graph
 for tu in range(0,len(spo2clone)):
     for ti in range(0,len(minsforspo2)):
         if spo2clone[tu] == minsforspo2[ti] and minsforspo2[ti] <= 98:
             ax5.plot(time[tu],minsforspo2[ti],'o')
             peak_detector[tu] = minsforspo2[ti]
-           
+# detect drops for prediction. 30 point timer, can be changed.            
 drop = 0
 instance = 0
 for tp in range(0,len(peak_detector)):
@@ -347,16 +352,16 @@ for tp in range(0,len(peak_detector)):
 
 print('Number of Drop Instances')
 print(instance)
-#approximately 400hz
+# approximately 400hz. Improved by calculation given from sample rate in collection script
 number_of_hours = len(time)/1440000
 AHI = instances/number_of_hours
 if AHI > 30.0:
     print('Severe OSA')
-elif AHI > 15.0
+elif AHI > 15.0:
     print('Moderate OSA')
-elif AHI > 5
+elif AHI > 5:
     print('Mild OSA')
-else
+else:
     print('No OSA')
 
 
