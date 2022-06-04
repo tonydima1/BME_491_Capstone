@@ -1,5 +1,5 @@
 # BME_491_Capstone:
-Capstone project from UNR. A sleep apnea device able to predict if user has OSA (obstructive sleep apnea).
+Capstone project from UNR. Code designed by me. A sleep apnea device able to predict if user has OSA (obstructive sleep apnea).
 
 Arduino_Sensor_Collect.ino: 
 Uses the max30102 sensor to connect collect IR light and Red light and send it to the ardunio's serial output. 
